@@ -14,5 +14,5 @@ jobs:
 
     - name: Start Live Stream
       run: |
-        VIDEO_URL="LINK_HERE"
+        VIDEO_URL="https://googleapis.com"
         ffmpeg -re -stream_loop -1 -i "$VIDEO_URL" -vcodec libx264 -preset veryfast -b:v 2500k -maxrate 2500k -bufsize 3000k -pix_fmt yuv420p -g 50 -c:a aac -b:a 128k -ar 44100 -f flv "rtmp://://youtube.com{{ secrets.STREAM_KEY }}"
