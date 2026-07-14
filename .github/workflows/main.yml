@@ -1,0 +1,18 @@
+name: 24/7 YouTube Live Loop
+
+on:
+  workflow_dispatch:
+
+jobs:
+  stream:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Install FFmpeg
+      run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+    - name: Start Continuous Streaming
+      run: |
+        ffmpeg -loop 1 -i lv.png -stream_loop -1 -i *.mp3 -c:v libx264 -preset veryfast -tune stillimage -b:v 2500k -maxrate 2500k -bufsize 5000k -pix_fmt yuv420p -g 60 -c:a aac -b:a 128k -ar 44100 -f flv rtmp://://youtube.com{{ secrets.YOUTUBE_STREAM_KEY }}
