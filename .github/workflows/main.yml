@@ -10,6 +10,11 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v3
 
+    - name: Install FFmpeg
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ffmpeg
+
     - name: Start Continuous Streaming
       run: |
         ffmpeg -loop 1 -i .github/workflows/lv.png -stream_loop -1 -i .github/workflows/audio.mp3 -c:v libx264 -preset ultrafast -tune stillimage -b:v 1500k -maxrate 1500k -bufsize 3000k -pix_fmt yuv420p -g 60 -c:a aac -b:a 128k -ar 44100 -f flv "rtmp://://youtube.com{{ secrets.YOUTUBE_STREAM_KEY }}"
