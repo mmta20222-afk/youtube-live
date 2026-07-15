@@ -17,4 +17,20 @@ jobs:
 
     - name: Start Continuous Streaming
       run: |
-        ffmpeg -loop 1 -re -i audio.mp3 -stream_loop -1 -i audio.mp3 -c:v libx264 -preset ultrafast -tune stillimage -b:v 1500k -maxrate 1500k -bufsize 3000k -pix_fmt yuv420p -g 60 -c:a aac -b:a 128k -ar 44100 -f flv "rtmp://://youtube.com{{ secrets.YOUTUBE_STREAM_KEY }}"
+        AUDIO_FILE=$(find . -name "*.mp3" | head -n 1)
+        IMAGE_FILE=$(find . \( -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" \) | head -n 1)
+        
+        if [ -z "$AUDIO_FILE" ] || [ -z "$IMAGE_FILE" ]; then
+          echo "Files missing! Using safe dummy stream mode..."
+          while true; do
+            ffmpeg -loop 1 -re -i "$IMAGE_FILE" -f lavfi -i anullsrc=channel_layout=stereo:sample_rate=44100 -c:v libx264 -preset ultrafast -tune stillimage -b:v 1500k -maxrate 1500k -bufsize 3000k -pix_fmt yuv420p -g 60 -c:a aac -b:a 128k -f flv "rtmp://://youtube.com{{ secrets.YOUTUBE_STREAM_KEY }}"
+            sleep 2
+          done
+        else
+          echo "Files found! Starting infinite music loop..."
+          while true; do
+            ffmpeg -loop 1 -re -i "$IMAGE_FILE" -stream_loop -1 -i "$AUDIO_FILE" -c:v libx264 -preset ultrafast -tune stillimage -b:v 1500k -maxrate 1500k -bufsize 3000k -pix_fmt yuv420p -g 60 -c:a aac -b:a 128k -ar 44100 -f flv "rtmp://://youtube.com{{ secrets.YOUTUBE_STREAM_KEY }}"
+            echo "Stream disconnected or ended. Restarting in 2 seconds..."
+            sleep 2
+          done
+        fi
