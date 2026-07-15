@@ -15,4 +15,6 @@ jobs:
 
     - name: Start Continuous Streaming
       run: |
-        ffmpeg -loop 1 -i lv.png -stream_loop -1 -i audio.mp3 -c:v libx264 -preset veryfast -tune stillimage -b:v 2500k -maxrate 2500k -bufsize 5000k -pix_fmt yuv420p -g 60 -c:a aac -b:a 128k -ar 44100 -f flv rtmp://://youtube.com{{ secrets.YOUTUBE_STREAM_KEY }}
+        AUDIO_FILE=$(ls *.mp3 | head -n 1)
+        IMAGE_FILE=$(ls *.png *.jpg *.jpeg 2>/blank | head -n 1)
+        ffmpeg -loop 1 -i "$IMAGE_FILE" -stream_loop -1 -i "$AUDIO_FILE" -c:v libx264 -preset veryfast -tune stillimage -b:v 2500k -maxrate 2500k -bufsize 5000k -pix_fmt yuv420p -g 60 -c:a aac -b:a 128k -ar 44100 -f flv rtmp://://youtube.com{{ secrets.YOUTUBE_STREAM_KEY }}
