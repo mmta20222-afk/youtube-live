@@ -17,4 +17,8 @@ jobs:
 
     - name: Start Continuous Streaming
       run: |
-        ffmpeg -loop 1 -r 30 -i ./lv.png -stream_loop -1 -i ./audio.mp3 -c:v libx264 -preset ultrafast -tune stillimage -b:v 2500k -maxrate 2500k -bufsize 5000k -pix_fmt yuv420p -g 60 -c:a aac -b:a 128k -ar 44100 -f flv "rtmp://://youtube.com{{ secrets.YOUTUBE_STREAM_KEY }}"
+        while true; do
+          ffmpeg -loop 1 -i ./lv.png -i ./audio.mp3 -c:v libx264 -preset ultrafast -tune stillimage -b:v 1500k -maxrate 1500k -bufsize 3000k -pix_fmt yuv420p -g 60 -c:a aac -b:a 128k -ar 44100 -shortest -f flv "rtmp://://youtube.com{{ secrets.YOUTUBE_STREAM_KEY }}"
+          echo "Stream crashed or finished, restarting in 5 seconds..."
+          sleep 5
+        done
